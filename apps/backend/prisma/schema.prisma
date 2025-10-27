@@ -12,40 +12,48 @@ datasource db {
 
 // User Management
 model User {
-  id              String   @id @default(cuid())
-  username        String   @unique
-  email           String   @unique
-  password        String
-  firstName       String
-  lastName        String
-  role            Role     @default(USER)
-  status          UserStatus @default(ACTIVE)
-  language        Language @default(EN)
-  department      String?
-  phoneNumber     String?
-  lastLoginAt     DateTime?
-  failedLoginAttempts Int    @default(0)
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt
-  createdBy       String?
-  updatedBy       String?
+  id                  String     @id @default(cuid())
+  username            String     @unique
+  email               String     @unique
+  password            String
+  firstName           String
+  lastName            String
+  status              UserStatus @default(ACTIVE)
+  language            Language   @default(EN)
+  department          String?
+  phoneNumber         String?
+  lastLoginAt         DateTime?
+  failedLoginAttempts Int        @default(0)
+  createdAt           DateTime   @default(now())
+  updatedAt           DateTime   @updatedAt
+  createdBy           String?
+  updatedBy           String?
 
   // Relations
-  createdByUser   User?    @relation("UserCreatedBy", fields: [createdBy], references: [id])
-  updatedByUser   User?    @relation("UserUpdatedBy", fields: [updatedBy], references: [id])
-  auditLogs       AuditLog[]
-  sessions        Session[]
-  permissions     Permission[] @relation("UserPermissions")
+  createdByUser      User?               @relation("UserCreatedBy", fields: [createdBy], references: [id])
+  updatedByUser      User?               @relation("UserUpdatedBy", fields: [updatedBy], references: [id])
+  createdByUsers     User[]              @relation("UserCreatedBy")
+  updatedByUsers     User[]              @relation("UserUpdatedBy")
+  auditLogs          AuditLog[]
+  sessions           Session[]
+  permissions        Permission[]        @relation("UserPermissions")
+  roles              Role[]
+  alerts             Alert[]             @relation("AlertUser")
+  acknowledgedAlerts Alert[]             @relation("AlertAcknowledgedBy")
+  inventoryMovements InventoryMovement[]
+  receivedInbounds   Inbound[]
+  issuedOutbounds    Outbound[]
+  importLogs         ImportLog[]
 }
 
 model Role {
-  id          String   @id @default(cuid())
-  name        String   @unique
+  id          String       @id @default(cuid())
+  name        String       @unique
   description String?
-  permissions PermissionRole[]
+  permissions Permission[] @relation("PermissionRole")
   users       User[]
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
 }
 
 model Permission {
@@ -54,312 +62,318 @@ model Permission {
   description String?
   resource    String
   action      String
-  users       User[]     @relation("UserPermissions")
-  roles       Role[]     @relation("PermissionRole")
-  createdAt   DateTime   @default(now())
-  updatedAt   DateTime   @updatedAt
+  users       User[]   @relation("UserPermissions")
+  roles       Role[]   @relation("PermissionRole")
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
 }
 
 // Warehouse Structure
 model Zone {
-  id              String      @id @default(cuid())
-  name            String      @unique
-  description     String?
-  color           String      @default("#007bff")
-  sortOrder       Int         @default(0)
-  status          ZoneStatus  @default(ACTIVE)
-  zoneType        ZoneType    @default(STORAGE)
-  capacity        Int         @default(10000)
-  currentStock    Int         @default(0)
-  temperatureZone TemperatureZone @default(AMBIENT)
-  isClimateControlled Boolean   @default(false)
-  racks           Rack[]
-  zoneBlocks      ZoneBlock[]
-  createdAt       DateTime    @default(now())
-  updatedAt       DateTime    @updatedAt
+  id                  String          @id @default(cuid())
+  name                String          @unique
+  description         String?
+  color               String          @default("#007bff")
+  sortOrder           Int             @default(0)
+  status              ZoneStatus      @default(ACTIVE)
+  zoneType            ZoneType        @default(STORAGE)
+  capacity            Int             @default(10000)
+  currentStock        Int             @default(0)
+  temperatureZone     TemperatureZone @default(AMBIENT)
+  isClimateControlled Boolean         @default(false)
+  racks               Rack[]
+  zoneBlocks          ZoneBlock[]
+  createdAt           DateTime        @default(now())
+  updatedAt           DateTime        @updatedAt
 }
 
 // Zone Block Management
 model ZoneBlock {
-  id              String      @id @default(cuid())
-  zoneId          String
-  blockName       String
-  description     String?
-  blockType       BlockType   @default(STORAGE)
-  capacity        Int         @default(1000)
-  currentStock    Int         @default(0)
-  sortOrder       Int         @default(0)
-  status          BlockStatus @default(ACTIVE)
-  temperatureZone TemperatureZone @default(AMBIENT)
-  isClimateControlled Boolean   @default(false)
-  zone            Zone        @relation(fields: [zoneId], references: [id])
-  blockRacks      BlockRack[]
-  blockParts      ZoneBlockPart[]
-  createdAt       DateTime    @default(now())
-  updatedAt       DateTime    @updatedAt
+  id                  String          @id @default(cuid())
+  zoneId              String
+  blockName           String
+  description         String?
+  blockType           BlockType       @default(STORAGE)
+  capacity            Int             @default(1000)
+  currentStock        Int             @default(0)
+  sortOrder           Int             @default(0)
+  status              BlockStatus     @default(ACTIVE)
+  temperatureZone     TemperatureZone @default(AMBIENT)
+  isClimateControlled Boolean         @default(false)
+  zone                Zone            @relation(fields: [zoneId], references: [id])
+  blockRacks          BlockRack[]
+  blockParts          ZoneBlockPart[]
+  createdAt           DateTime        @default(now())
+  updatedAt           DateTime        @updatedAt
 }
 
 // Block-Rack Association
 model BlockRack {
-  id          String   @id @default(cuid())
-  blockId     String
-  rackId      String
-  sortOrder   Int      @default(0)
-  isActive    Boolean  @default(true)
-  block       ZoneBlock @relation(fields: [blockId], references: [id])
-  rack        Rack      @relation(fields: [rackId], references: [id])
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  id        String    @id @default(cuid())
+  blockId   String
+  rackId    String
+  sortOrder Int       @default(0)
+  isActive  Boolean   @default(true)
+  block     ZoneBlock @relation(fields: [blockId], references: [id])
+  rack      Rack      @relation(fields: [rackId], references: [id])
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
 }
 
 // Zone Block Part Assignment
 model ZoneBlockPart {
-  id              String   @id @default(cuid())
-  blockId         String
-  partId          String
-  assignedQuantity Int     @default(0)
-  minStock        Int      @default(10)
-  maxStock        Int      @default(100)
-  reorderPoint    Int      @default(50)
-  isPrimaryLocation Boolean @default(false)
-  status          AssignmentStatus @default(ACTIVE)
-  block           ZoneBlock @relation(fields: [blockId], references: [id])
-  part            Part      @relation(fields: [partId], references: [id])
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt
+  id                String           @id @default(cuid())
+  blockId           String
+  partId            String
+  assignedQuantity  Int              @default(0)
+  minStock          Int              @default(10)
+  maxStock          Int              @default(100)
+  reorderPoint      Int              @default(50)
+  isPrimaryLocation Boolean          @default(false)
+  status            AssignmentStatus @default(ACTIVE)
+  block             ZoneBlock        @relation(fields: [blockId], references: [id])
+  part              Part             @relation(fields: [partId], references: [id])
+  createdAt         DateTime         @default(now())
+  updatedAt         DateTime         @updatedAt
 }
 
 model Rack {
-  id          String   @id @default(cuid())
-  zoneId      String
-  name        String
-  description String?
-  verticalRow Int
+  id            String      @id @default(cuid())
+  zoneId        String
+  name          String
+  description   String?
+  verticalRow   Int
   horizontalRow Int
-  capacity    Int      @default(1000)
-  currentStock Int     @default(0)
-  status      RackStatus @default(ACTIVE)
-  bins        Bin[]
-  zone        Zone     @relation(fields: [zoneId], references: [id])
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  capacity      Int         @default(1000)
+  currentStock  Int         @default(0)
+  status        RackStatus  @default(ACTIVE)
+  bins          Bin[]
+  zone          Zone        @relation(fields: [zoneId], references: [id])
+  blockRacks    BlockRack[]
+  createdAt     DateTime    @default(now())
+  updatedAt     DateTime    @updatedAt
 }
 
 model Bin {
-  id              String   @id @default(cuid())
-  rackId          String
-  name            String
-  description     String?
-  barcode         String   @unique
-  locationCode    String   @unique
-  capacity        Int      @default(100)
-  currentStock    Int      @default(0)
-  minStock        Int      @default(10)
-  maxStock        Int      @default(100)
-  status          BinStatus @default(ACTIVE)
-  rack            Rack     @relation(fields: [rackId], references: [id])
-  inventoryItems  InventoryItem[]
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt
+  id             String          @id @default(cuid())
+  rackId         String
+  name           String
+  description    String?
+  barcode        String          @unique
+  locationCode   String          @unique
+  capacity       Int             @default(100)
+  currentStock   Int             @default(0)
+  minStock       Int             @default(10)
+  maxStock       Int             @default(100)
+  status         BinStatus       @default(ACTIVE)
+  rack           Rack            @relation(fields: [rackId], references: [id])
+  inventoryItems InventoryItem[]
+  createdAt      DateTime        @default(now())
+  updatedAt      DateTime        @updatedAt
 }
 
 // Inventory Management
 model Part {
-  id              String   @id @default(cuid())
-  partNumber      String   @unique
-  description     String
-  category        String
-  unit            String   @default("PCS")
-  barcode         String?  @unique
-  imageKey        String?  // MinIO object key
-  specification   String?
-  supplier        String?
-  leadTime        Int?     // days
-  reorderPoint    Int      @default(50)
-  safetyStock     Int      @default(20)
-  status          PartStatus @default(ACTIVE)
-  inventoryItems  InventoryItem[]
-  inboundItems    InboundItem[]
-  outboundItems   OutboundItem[]
-  importLogs      ImportLog[]
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt
+  id             String          @id @default(cuid())
+  partNumber     String          @unique
+  description    String
+  category       String
+  unit           String          @default("PCS")
+  barcode        String?         @unique
+  imageKey       String? // MinIO object key
+  specification  String?
+  supplier       String?
+  leadTime       Int? // days
+  reorderPoint   Int             @default(50)
+  safetyStock    Int             @default(20)
+  status         PartStatus      @default(ACTIVE)
+  inventoryItems InventoryItem[]
+  inboundItems   InboundItem[]
+  outboundItems  OutboundItem[]
+  importLogs     ImportLog[]
+  zoneBlockParts ZoneBlockPart[]
+  importDetails  ImportDetail[]
+  createdAt      DateTime        @default(now())
+  updatedAt      DateTime        @updatedAt
 }
 
 model InventoryItem {
-  id          String   @id @default(cuid())
-  partId      String
-  binId       String
-  quantity    Int
-  reserved    Int      @default(0)
-  available   Int      @default(0)
-  lotNumber   String?
-  expiryDate  DateTime?
-  status      InventoryStatus @default(ACTIVE)
-  part        Part     @relation(fields: [partId], references: [id])
-  bin         Bin      @relation(fields: [binId], references: [id])
-  movements   InventoryMovement[]
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  id         String              @id @default(cuid())
+  partId     String
+  binId      String
+  quantity   Int
+  reserved   Int                 @default(0)
+  available  Int                 @default(0)
+  lotNumber  String?
+  expiryDate DateTime?
+  status     InventoryStatus     @default(ACTIVE)
+  part       Part                @relation(fields: [partId], references: [id])
+  bin        Bin                 @relation(fields: [binId], references: [id])
+  movements  InventoryMovement[]
+  createdAt  DateTime            @default(now())
+  updatedAt  DateTime            @updatedAt
 }
 
 model InventoryMovement {
-  id              String   @id @default(cuid())
+  id              String        @id @default(cuid())
   inventoryItemId String
   type            MovementType
   quantity        Int
   fromLocation    String?
   toLocation      String?
-  referenceId     String?  // Inbound/Outbound ID
-  referenceType   String?  // INBOUND/OUTBOUND
+  referenceId     String? // Inbound/Outbound ID
+  referenceType   String? // INBOUND/OUTBOUND
   reason          String?
-  performedBy     String?  // User ID
+  performedBy     String? // User ID
   notes           String?
   inventoryItem   InventoryItem @relation(fields: [inventoryItemId], references: [id])
-  performedByUser User?    @relation(fields: [performedBy], references: [id])
-  createdAt       DateTime @default(now())
+  performedByUser User?         @relation(fields: [performedBy], references: [id])
+  createdAt       DateTime      @default(now())
 }
 
 // Inbound/Outbound Operations
 model Inbound {
-  id              String   @id @default(cuid())
-  localKanbanId   String   @unique
-  storeAddress    String
-  customerPartNo  String
-  quantity        Int
-  receivedBy      String?  // User ID
-  receivedAt      DateTime
-  status          InboundStatus @default(PENDING)
-  notes           String?
-  receivedByUser  User?    @relation(fields: [receivedBy], references: [id])
-  items           InboundItem[]
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt
+  id             String        @id @default(cuid())
+  localKanbanId  String        @unique
+  storeAddress   String
+  customerPartNo String
+  quantity       Int
+  receivedBy     String? // User ID
+  receivedAt     DateTime
+  status         InboundStatus @default(PENDING)
+  notes          String?
+  receivedByUser User?         @relation(fields: [receivedBy], references: [id])
+  items          InboundItem[]
+  createdAt      DateTime      @default(now())
+  updatedAt      DateTime      @updatedAt
 }
 
 model InboundItem {
-  id          String   @id @default(cuid())
+  id          String            @id @default(cuid())
   inboundId   String
   partId      String
   quantity    Int
-  unitPrice   Decimal? @default(0)
-  totalAmount Decimal? @default(0)
+  unitPrice   Decimal?          @default(0)
+  totalAmount Decimal?          @default(0)
   status      InboundItemStatus @default(PENDING)
-  inbound     Inbound  @relation(fields: [inboundId], references: [id])
-  part        Part     @relation(fields: [partId], references: [id])
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  inbound     Inbound           @relation(fields: [inboundId], references: [id])
+  part        Part              @relation(fields: [partId], references: [id])
+  createdAt   DateTime          @default(now())
+  updatedAt   DateTime          @updatedAt
 }
 
 model Outbound {
-  id              String   @id @default(cuid())
-  localKanbanId   String   @unique
-  storeAddress    String
-  customerPartNo  String
-  quantity        Int
-  issuedBy        String?  // User ID
-  issuedAt        DateTime
-  status          OutboundStatus @default(PENDING)
-  notes           String?
-  issuedByUser    User?    @relation(fields: [issuedBy], references: [id])
-  items           OutboundItem[]
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt
+  id             String         @id @default(cuid())
+  localKanbanId  String         @unique
+  storeAddress   String
+  customerPartNo String
+  quantity       Int
+  issuedBy       String? // User ID
+  issuedAt       DateTime
+  status         OutboundStatus @default(PENDING)
+  notes          String?
+  issuedByUser   User?          @relation(fields: [issuedBy], references: [id])
+  items          OutboundItem[]
+  createdAt      DateTime       @default(now())
+  updatedAt      DateTime       @updatedAt
 }
 
 model OutboundItem {
-  id          String   @id @default(cuid())
+  id          String             @id @default(cuid())
   outboundId  String
   partId      String
   quantity    Int
-  unitPrice   Decimal? @default(0)
-  totalAmount Decimal? @default(0)
+  unitPrice   Decimal?           @default(0)
+  totalAmount Decimal?           @default(0)
   status      OutboundItemStatus @default(PENDING)
-  outbound    Outbound @relation(fields: [outboundId], references: [id])
-  part        Part     @relation(fields: [partId], references: [id])
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  outbound    Outbound           @relation(fields: [outboundId], references: [id])
+  part        Part               @relation(fields: [partId], references: [id])
+  createdAt   DateTime           @default(now())
+  updatedAt   DateTime           @updatedAt
 }
 
 // Import/Export Management
 model ImportLog {
-  id              String   @id @default(cuid())
+  id              String         @id @default(cuid())
   fileName        String
-  fileType        String   // XLSX, CSV
+  fileType        String // XLSX, CSV
   totalRows       Int
   importedRows    Int
   failedRows      Int
-  status          ImportStatus @default(PROCESSING)
+  status          ImportStatus   @default(PROCESSING)
   errorMessage    String?
-  rowHash         String?  // SHA256 hash for deduplication
-  importedBy      String?  // User ID
+  rowHash         String? // SHA256 hash for deduplication
+  importedBy      String? // User ID
   templateVersion String?
-  processingTime  Int?     // milliseconds
-  importedByUser  User?    @relation(fields: [importedBy], references: [id])
+  processingTime  Int? // milliseconds
+  importedByUser  User?          @relation(fields: [importedBy], references: [id])
   importDetails   ImportDetail[]
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt
+  createdAt       DateTime       @default(now())
+  updatedAt       DateTime       @updatedAt
+  Part            Part?          @relation(fields: [partId], references: [id])
+  partId          String?
 }
 
 model ImportDetail {
-  id          String   @id @default(cuid())
-  importLogId String
-  rowNumber   Int
-  partId      String?
-  status      ImportDetailStatus @default(PENDING)
+  id           String             @id @default(cuid())
+  importLogId  String
+  rowNumber    Int
+  partId       String?
+  status       ImportDetailStatus @default(PENDING)
   errorMessage String?
-  data        Json     // Raw row data
-  part        Part?    @relation(fields: [partId], references: [id])
-  createdAt   DateTime @default(now())
+  data         Json // Raw row data
+  part         Part?              @relation(fields: [partId], references: [id])
+  createdAt    DateTime           @default(now())
+  ImportLog    ImportLog          @relation(fields: [importLogId], references: [id])
 }
 
 // Alerts and Notifications
 model Alert {
-  id          String   @id @default(cuid())
-  type        AlertType
-  severity    AlertSeverity @default(INFO)
-  title       String
-  message     String
-  data        Json?
-  userId      String?  // Target user
-  acknowledged Boolean  @default(false)
-  acknowledgedAt DateTime?
-  acknowledgedBy String?
-  expiresAt   DateTime?
-  status      AlertStatus @default(ACTIVE)
-  user        User?    @relation(fields: [userId], references: [id])
-  acknowledgedByUser User? @relation("AlertAcknowledgedBy", fields: [acknowledgedBy], references: [id])
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  id                 String        @id @default(cuid())
+  type               AlertType
+  severity           AlertSeverity @default(INFO)
+  title              String
+  message            String
+  data               Json?
+  userId             String? // Target user
+  acknowledged       Boolean       @default(false)
+  acknowledgedAt     DateTime?
+  acknowledgedBy     String?
+  expiresAt          DateTime?
+  status             AlertStatus   @default(ACTIVE)
+  user               User?         @relation("AlertUser", fields: [userId], references: [id])
+  acknowledgedByUser User?         @relation("AlertAcknowledgedBy", fields: [acknowledgedBy], references: [id])
+  createdAt          DateTime      @default(now())
+  updatedAt          DateTime      @updatedAt
 }
 
 // Audit and Security
 model AuditLog {
-  id          String   @id @default(cuid())
-  userId      String
-  action      String
-  resource    String
-  resourceId  String?
-  oldValues   Json?
-  newValues   Json?
-  ipAddress   String?
-  userAgent   String?
-  sessionId   String?
-  createdAt   DateTime @default(now())
-  user        User     @relation(fields: [userId], references: [id])
+  id         String   @id @default(cuid())
+  userId     String
+  action     String
+  resource   String
+  resourceId String?
+  oldValues  Json?
+  newValues  Json?
+  ipAddress  String?
+  userAgent  String?
+  sessionId  String?
+  createdAt  DateTime @default(now())
+  user       User     @relation(fields: [userId], references: [id])
 }
 
 model Session {
-  id          String   @id @default(cuid())
-  userId      String
-  token       String   @unique
-  ipAddress   String?
-  userAgent   String?
-  expiresAt   DateTime
+  id           String   @id @default(cuid())
+  userId       String
+  token        String   @unique
+  ipAddress    String?
+  userAgent    String?
+  expiresAt    DateTime
   lastActivity DateTime @default(now())
-  isActive    Boolean  @default(true)
-  user        User     @relation(fields: [userId], references: [id])
-  createdAt   DateTime @default(now())
+  isActive     Boolean  @default(true)
+  user         User     @relation(fields: [userId], references: [id])
+  createdAt    DateTime @default(now())
 }
 
 // Enums

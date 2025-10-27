@@ -3,7 +3,6 @@ import { AppModule } from './app/app.module';
 import { ValidationPipe } from '@nestjs/common';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { ConfigService } from '@nestjs/config';
-import { WsAdapter } from '@nestjs/platform-socket.io';
 import { Logger } from '@nestjs/common';
 
 async function bootstrap() {
@@ -15,8 +14,6 @@ async function bootstrap() {
     credentials: true,
   });
 
-  // Use WebSocket adapter
-  app.useWebSocketAdapter(new WsAdapter(app));
 
   // Global validation pipe
   app.useGlobalPipes(new ValidationPipe({
