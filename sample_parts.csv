@@ -1,0 +1,11 @@
+part_number,description,category,unit,min_stock,max_stock,location,barcode
+P001-MOTOR,Electric Motor 1.5HP,Electrical,PCS,50,200,A-01-01,MOTOR15HP
+P002-BEARING,Ball Bearing 6205,Mechanical,PCS,100,500,A-01-02,BEARING6205
+P003-CABLE,Power Cable 3x2.5mm,Electrical,M,200,1000,A-02-01,CABLE3X25
+P004-GEAR,Spur Gear 20T,Mechanical,PCS,75,300,A-02-02,GEAR20T
+P005-SENSOR,Proximity Sensor NPN,Electronic,PCS,30,150,A-03-01,SENSORNPN
+P006-VALVE,Solenoid Valve 24V,Electrical,PCS,40,200,A-03-02,VALVE24V
+P007-PUMP,Centrifugal Pump 1HP,Mechanical,PCS,25,100,A-04-01,PUMP1HP
+P008-HEATER,Cartridge Heater 500W,Electrical,PCS,35,175,A-04-02,HEATER500W
+P009-CONTROLLER,PLC Controller S7-1200,Electronic,PCS,20,80,A-05-01,PLCS71200
+P010-TRANSFORMER,Step-down Transformer 220V,Electrical,PCS,15,75,A-05-02,TRANSFORMER220V

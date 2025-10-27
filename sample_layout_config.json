@@ -1,0 +1,132 @@
+{
+  "layoutDemo": {
+    "zones": [
+      {
+        "name": "A",
+        "zoneType": "STORAGE",
+        "description": "Main storage zone",
+        "color": "#007bff",
+        "capacity": 50000,
+        "temperatureZone": "AMBIENT",
+        "isClimateControlled": false,
+        "blocks": [
+          {
+            "blockName": "A1",
+            "blockType": "STORAGE",
+            "description": "Primary storage block",
+            "capacity": 20000,
+            "temperatureZone": "AMBIENT",
+            "isClimateControlled": false,
+            "assignedParts": [
+              {
+                "partNumber": "P001-MOTOR",
+                "assignedQuantity": 500,
+                "minStock": 100,
+                "maxStock": 1000,
+                "reorderPoint": 200,
+                "isPrimaryLocation": true
+              },
+              {
+                "partNumber": "P002-BEARING", 
+                "assignedQuantity": 1000,
+                "minStock": 200,
+                "maxStock": 2000,
+                "reorderPoint": 500,
+                "isPrimaryLocation": true
+              }
+            ]
+          },
+          {
+            "blockName": "A2",
+            "blockType": "PICKING",
+            "description": "Picking and order fulfillment",
+            "capacity": 10000,
+            "temperatureZone": "AMBIENT",
+            "isClimateControlled": false,
+            "assignedParts": [
+              {
+                "partNumber": "P003-CABLE",
+                "assignedQuantity": 300,
+                "minStock": 50,
+                "maxStock": 500,
+                "reorderPoint": 100,
+                "isPrimaryLocation": false
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "name": "B",
+        "zoneType": "RECEIVING",
+        "description": "Receiving and inspection zone",
+        "color": "#28a745",
+        "capacity": 20000,
+        "temperatureZone": "AMBIENT",
+        "isClimateControlled": false,
+        "blocks": [
+          {
+            "blockName": "B1",
+            "blockType": "RECEIVING",
+            "description": "Incoming goods inspection",
+            "capacity": 15000,
+            "temperatureZone": "AMBIENT",
+            "isClimateControlled": false,
+            "assignedParts": []
+          },
+          {
+            "blockName": "B2",
+            "blockType": "QC",
+            "description": "Quality control area",
+            "capacity": 5000,
+            "temperatureZone": "AMBIENT",
+            "isClimateControlled": false,
+            "assignedParts": []
+          }
+        ]
+      },
+      {
+        "name": "C",
+        "zoneType": "SHIPPING",
+        "description": "Shipping and dispatch zone",
+        "color": "#dc3545",
+        "capacity": 15000,
+        "temperatureZone": "AMBIENT",
+        "isClimateControlled": false,
+        "blocks": [
+          {
+            "blockName": "C1",
+            "blockType": "SHIPPING",
+            "description": "Outbound shipments",
+            "capacity": 10000,
+            "temperatureZone": "AMBIENT",
+            "isClimateControlled": false,
+            "assignedParts": []
+          },
+          {
+            "blockName": "C2",
+            "blockType": "PACKING",
+            "description": "Packing and labeling",
+            "capacity": 5000,
+            "temperatureZone": "AMBIENT",
+            "isClimateControlled": false,
+            "assignedParts": []
+          }
+        ]
+      }
+    ],
+    "rackConfiguration": {
+      "defaultVerticalRows": 99,
+      "defaultHorizontalRows": 10,
+      "rackCapacity": 1000,
+      "binCapacity": 100
+    },
+    "layoutFeatures": {
+      "allowCustomZoneNames": true,
+      "maxZones": 50,
+      "zoneNamingPattern": "^[A-Z]{1,3}[0-9]{0,2}$",
+      "blockTypes": ["STORAGE", "RECEIVING", "SHIPPING", "PICKING", "QC", "DAMAGE", "PACKING", "RETURNS", "MAINTENANCE", "TEMPORARY", "SEASONAL"],
+      "temperatureZones": ["AMBIENT", "COLD", "FREEZE", "CONTROLLED", "HAZARDOUS"]
+    }
+  }
+}
