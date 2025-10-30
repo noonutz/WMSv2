@@ -8,8 +8,8 @@ export class AppService {
   getWelcomeMessage() {
     return {
       name: 'WMS - Smart Factory API',
-      version: this.configService.get('npm_package_version', '1.0.0'),
-      environment: this.configService.get('NODE_ENV', 'development'),
+      version: this.configService.get<string>('npm_package_version', '1.0.0'),
+      environment: this.configService.get<string>('NODE_ENV', 'development'),
       timestamp: new Date().toISOString(),
       modules: {
         auth: '/auth/login',
