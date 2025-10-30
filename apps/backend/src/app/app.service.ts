@@ -1,46 +1,26 @@
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { PrismaService } from '../shared/prisma/prisma.service';
 
 @Injectable()
 export class AppService {
-  constructor(
-    private readonly configService: ConfigService,
-    private readonly prismaService: PrismaService,
-  ) {}
+  constructor(private readonly configService: ConfigService) {}
 
-  getHealth() {
+  getWelcomeMessage() {
     return {
-      status: 'ok',
-      timestamp: new Date().toISOString(),
+      name: 'WMS - Smart Factory API',
       version: this.configService.get('npm_package_version', '1.0.0'),
       environment: this.configService.get('NODE_ENV', 'development'),
-    };
-  }
-
-  async getProfile(user: any) {
-    const userProfile = await this.prismaService.user.findUnique({
-      where: { id: user.id },
-      select: {
-        id: true,
-        username: true,
-        email: true,
-        firstName: true,
-        lastName: true,
-        roles: {
-          select: {
-            id: true,
-            name: true,
-          },
-        },
-        language: true,
-        department: true,
-        phoneNumber: true,
-        lastLoginAt: true,
-        createdAt: true,
+      timestamp: new Date().toISOString(),
+      modules: {
+        auth: '/auth/login',
+        users: '/users',
+        layout: '/layout/overview',
+        inventory: '/inventory/summary',
+        imports: '/imports/logs',
+        alerts: '/alerts',
+        operations: '/operations/inbound',
       },
-    });
-
-    return userProfile;
+      documentation: '/api/docs',
+    };
   }
 }
