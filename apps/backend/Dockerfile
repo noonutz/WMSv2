@@ -4,7 +4,7 @@ FROM node:18-alpine AS base
 WORKDIR /app
 
 FROM base AS deps
-ENV NODE_ENV=development
+
 COPY package.json package-lock.json ./
 RUN npm ci
 
