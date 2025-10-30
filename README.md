@@ -83,6 +83,25 @@ wms-monorepo/
    > `apps/frontend/previews`. Install packages and rerun or execute `npm run dev:next`
    > for the full Next.js development server.
 
+### 🧰 Monorepo npm scripts
+
+After installing dependencies inside each workspace you can use the root-level npm scripts to manage
+the entire stack without switching directories:
+
+```bash
+# Build the NestJS API and the Next.js app (in that order)
+npm run build
+
+# Execute backend unit tests
+npm test
+
+# Launch both backend and frontend development servers together
+npm run dev
+```
+
+The helper scripts delegate to the underlying workspace commands so the existing build/test/dev
+behaviour is preserved while providing a single entry point for local development.
+
 6. **Demo credentials**
 
    | Role     | Username | Password   |

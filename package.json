@@ -1,0 +1,14 @@
+{
+  "name": "wms-monorepo",
+  "private": true,
+  "workspaces": [
+    "apps/backend",
+    "apps/frontend",
+    "packages/shared"
+  ],
+  "scripts": {
+    "build": "npm run build --workspace apps/backend && npm run build --workspace apps/frontend",
+    "test": "npm test --workspace apps/backend",
+    "dev": "node scripts/dev.js"
+  }
+}
