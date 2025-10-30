@@ -73,10 +73,15 @@ wms-monorepo/
    ```bash
    # Backend
    cd apps/backend && npm run start:dev
-   
+
    # Frontend
    cd apps/frontend && npm run dev
    ```
+
+   > 🖥️ **Dev preview fallback:** When dependencies are not installed the command serves a
+   > static preview at `http://localhost:4100` using the mock dashboard inside
+   > `apps/frontend/previews`. Install packages and rerun or execute `npm run dev:next`
+   > for the full Next.js development server.
 
 6. **Demo credentials**
 
@@ -86,6 +91,13 @@ wms-monorepo/
    | Operator | `operator` | `Operator@123` |
 
    The sample credentials unlock the dashboard, layout grid, Min/Max alert center, import history, and RBAC overview pages.
+
+## 🧪 Offline Tooling Reference
+
+- **Frontend build fallback**: `npm run build` first tries to execute the real `next build`. When dependencies are missing the helper script writes a mock artifact to `.next/mock-build/` (including a `manifest.json` and status report) so CI pipelines still have deterministic outputs. Install packages and run `npm run build:next` whenever a production build is required.
+- **Static development preview**: `npm run dev` serves the curated preview from `apps/frontend/previews/` whenever the Next.js binary is unavailable. The HTML includes dashboard KPIs, zone drill-downs, import tables, alerts, and RBAC cards to mimic the live UI.
+- **Custom preview port**: Set the `PREVIEW_PORT` environment variable before running `npm run dev` if port `4100` is already in use. The fallback service binds to `0.0.0.0` so it can be proxied inside containerized environments.
+- **Upgrade path**: After running `npm install`, re-run `npm run dev` (or call `npm run dev:next` directly) to switch from the static preview to the full Next.js development server with hot reloading.
 
 ## 📊 Dashboard Preview
 

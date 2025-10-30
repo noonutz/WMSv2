@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>WMS Frontend Preview</title>
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <header>
+      <div>
+        <h1>WMS Enterprise Control Center</h1>
+        <span class="badge">Demo Mode</span>
+      </div>
+      <div class="actions">
+        <button class="language" data-lang="en">EN</button>
+        <button class="language" data-lang="th">TH</button>
+      </div>
+    </header>
+    <main>
+      <nav>
+        <a href="#dashboard" class="active">Dashboard</a>
+        <a href="#layout">Layout Grid</a>
+        <a href="#operations">Inbound / Outbound</a>
+        <a href="#imports">Import Center</a>
+        <a href="#alerts">Alerts</a>
+        <a href="#admin">Admin &amp; RBAC</a>
+      </nav>
+      <div class="content">
+        <section id="dashboard">
+          <div class="section-title">
+            <h2 data-i18n="dashboard.title">Daily KPI Overview</h2>
+            <span data-i18n="dashboard.updated">Updated 5 minutes ago</span>
+          </div>
+          <div class="cards">
+            <article class="card success">
+              <div class="label" data-i18n="dashboard.throughput">Throughput</div>
+              <div class="value">5,420</div>
+              <div class="delta" data-i18n="dashboard.throughputDelta">+3.2% vs. yesterday</div>
+            </article>
+            <article class="card">
+              <div class="label" data-i18n="dashboard.accuracy">Inventory Accuracy</div>
+              <div class="value">99.87%</div>
+              <div class="delta" data-i18n="dashboard.accuracyDelta">Target ≥ 99.8%</div>
+            </article>
+            <article class="card warning">
+              <div class="label" data-i18n="dashboard.waiting">Pending Put-away</div>
+              <div class="value">38</div>
+              <div class="delta" data-i18n="dashboard.waitingDelta">12 exceeding SLA</div>
+            </article>
+            <article class="card danger">
+              <div class="label" data-i18n="dashboard.minBreaches">Min Threshold Breaches</div>
+              <div class="value">6</div>
+              <div class="delta" data-i18n="dashboard.minBreachesDelta">Critical attention required</div>
+            </article>
+          </div>
+        </section>
+
+        <section id="layout">
+          <div class="section-title">
+            <h2 data-i18n="layout.title">Zone Layout A – Z</h2>
+            <span data-i18n="layout.subtitle">Tap a block to inspect bins &amp; capacity</span>
+          </div>
+          <div class="grid">
+            <div class="zone">
+              <strong>Zone A</strong>
+              <div class="status ok" data-i18n="layout.statusStable">Stable</div>
+              <p data-i18n="layout.zoneADetail">Average utilisation 63%</p>
+            </div>
+            <div class="zone">
+              <strong>Zone B</strong>
+              <div class="status max" data-i18n="layout.statusMax">Near Max</div>
+              <p data-i18n="layout.zoneBDetail">High runner parts queued</p>
+            </div>
+            <div class="zone">
+              <strong>Zone C</strong>
+              <div class="status ok" data-i18n="layout.statusStable">Stable</div>
+              <p data-i18n="layout.zoneCDetail">Cold storage ✓</p>
+            </div>
+            <div class="zone">
+              <strong>Zone D</strong>
+              <div class="status min" data-i18n="layout.statusMin">Below Min</div>
+              <p data-i18n="layout.zoneDDetail">Trigger auto-replenishment</p>
+            </div>
+            <div class="zone">
+              <strong>Zone E</strong>
+              <div class="status ok" data-i18n="layout.statusStable">Stable</div>
+              <p data-i18n="layout.zoneEDetail">Buffered for outbound</p>
+            </div>
+            <div class="zone">
+              <strong>Zone F</strong>
+              <div class="status max" data-i18n="layout.statusMax">Near Max</div>
+              <p data-i18n="layout.zoneFDetail">Bulk material inbound</p>
+            </div>
+          </div>
+        </section>
+
+        <section id="operations">
+          <div class="section-title">
+            <h2 data-i18n="operations.title">Inbound / Outbound Snapshot</h2>
+            <span data-i18n="operations.subtitle">Zebra TC-21 scans synced in real time</span>
+          </div>
+          <table class="table">
+            <thead>
+              <tr>
+                <th data-i18n="operations.part">Part</th>
+                <th data-i18n="operations.kanban">LocalKanbanID</th>
+                <th data-i18n="operations.status">Status</th>
+                <th data-i18n="operations.time">Timestamp</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>PLX-8890</td>
+                <td>LK-22190</td>
+                <td><span class="badge success" data-i18n="operations.received">Inbound received</span></td>
+                <td>09:14</td>
+              </tr>
+              <tr>
+                <td>TRM-4421</td>
+                <td>LK-11834</td>
+                <td><span class="badge warning" data-i18n="operations.pending">Pending QA</span></td>
+                <td>09:26</td>
+              </tr>
+              <tr>
+                <td>CVR-9907</td>
+                <td>LK-90321</td>
+                <td><span class="badge" data-i18n="operations.dispatched">Outbound dispatched</span></td>
+                <td>09:31</td>
+              </tr>
+            </tbody>
+          </table>
+        </section>
+
+        <section id="imports">
+          <div class="section-title">
+            <h2 data-i18n="imports.title">Import &amp; Audit History</h2>
+            <span data-i18n="imports.subtitle">Row-hash validation prevents duplicates</span>
+          </div>
+          <div class="history">
+            <table>
+              <thead>
+                <tr>
+                  <th data-i18n="imports.file">File</th>
+                  <th data-i18n="imports.records">Records</th>
+                  <th data-i18n="imports.result">Result</th>
+                  <th data-i18n="imports.by">By</th>
+                  <th data-i18n="imports.at">Imported at</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>factory-parts-2024-05.xlsx</td>
+                  <td>1,245</td>
+                  <td><span class="badge success" data-i18n="imports.success">Success</span></td>
+                  <td>Anong (Admin)</td>
+                  <td>2024-05-14 21:20</td>
+                </tr>
+                <tr>
+                  <td>minmax-refresh.csv</td>
+                  <td>88</td>
+                  <td><span class="badge warning" data-i18n="imports.partial">Partial</span></td>
+                  <td>Somchai (Planner)</td>
+                  <td>2024-05-14 18:05</td>
+                </tr>
+                <tr>
+                  <td>line3-kanban.csv</td>
+                  <td>340</td>
+                  <td><span class="badge" data-i18n="imports.pending">Pending Review</span></td>
+                  <td>Wirat (Supervisor)</td>
+                  <td>2024-05-14 16:42</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+        <section id="alerts">
+          <div class="section-title">
+            <h2 data-i18n="alerts.title">Live Alerts</h2>
+            <span data-i18n="alerts.subtitle">Auto-notifications via Slack &amp; Email</span>
+          </div>
+          <div class="alerts">
+            <div class="alert">
+              <div class="title" data-i18n="alerts.alert1Title">Zone D Bin 07 below safety stock</div>
+              <div class="body" data-i18n="alerts.alert1Body">Replenish within 15 minutes to avoid line stop.</div>
+            </div>
+            <div class="alert acknowledged">
+              <div class="title" data-i18n="alerts.alert2Title">Temperature excursion resolved</div>
+              <div class="body" data-i18n="alerts.alert2Body">Cold room sensors back within threshold.</div>
+            </div>
+          </div>
+        </section>
+
+        <section id="admin">
+          <div class="section-title">
+            <h2 data-i18n="admin.title">RBAC Overview</h2>
+            <span data-i18n="admin.subtitle">Audit log retained for 365 days</span>
+          </div>
+          <table class="table">
+            <thead>
+              <tr>
+                <th data-i18n="admin.role">Role</th>
+                <th data-i18n="admin.scope">Scope</th>
+                <th data-i18n="admin.users">Users</th>
+                <th data-i18n="admin.lastChange">Last change</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>Admin</td>
+                <td data-i18n="admin.scopeAdmin">Full access</td>
+                <td>4</td>
+                <td>2024-05-12 10:02</td>
+              </tr>
+              <tr>
+                <td>Planner</td>
+                <td data-i18n="admin.scopePlanner">Import + Layout edit</td>
+                <td>9</td>
+                <td>2024-05-11 17:48</td>
+              </tr>
+              <tr>
+                <td>Operator</td>
+                <td data-i18n="admin.scopeOperator">Inbound / Outbound</td>
+                <td>37</td>
+                <td>2024-05-11 09:32</td>
+              </tr>
+            </tbody>
+          </table>
+        </section>
+      </div>
+    </main>
+    <footer>
+      <span data-i18n="footer">Smart Factory Ready • Docker / Kubernetes deployable • Powered by NestJS + Next.js</span>
+    </footer>
+
+    <script>
+      const translations = {
+        th: {
+          'dashboard.title': 'ภาพรวม KPI รายวัน',
+          'dashboard.updated': 'อัปเดตเมื่อ 5 นาทีที่แล้ว',
+          'dashboard.throughput': 'ปริมาณงานต่อชั่วโมง',
+          'dashboard.throughputDelta': '+3.2% เทียบเมื่อวาน',
+          'dashboard.accuracy': 'ความถูกต้องของสต็อก',
+          'dashboard.accuracyDelta': 'เป้าหมาย ≥ 99.8%',
+          'dashboard.waiting': 'งานรอจัดเก็บ',
+          'dashboard.waitingDelta': '12 รายการเกิน SLA',
+          'dashboard.minBreaches': 'ต่ำกว่า Min',
+          'dashboard.minBreachesDelta': 'ต้องรีบแก้ไข',
+          'layout.title': 'ผังคลังสินค้า A – Z',
+          'layout.subtitle': 'คลิกบล็อกเพื่อดู Bin และความจุ',
+          'layout.statusStable': 'ปกติ',
+          'layout.statusMax': 'ใกล้เต็ม',
+          'layout.statusMin': 'ต่ำกว่าขั้นต่ำ',
+          'layout.zoneADetail': 'การใช้งานเฉลี่ย 63%',
+          'layout.zoneBDetail': 'ชิ้นส่วนยอดนิยมรอจัดเก็บ',
+          'layout.zoneCDetail': 'ห้องเย็นพร้อมใช้งาน',
+          'layout.zoneDDetail': 'กำลังเตรียมเติมเต็มอัตโนมัติ',
+          'layout.zoneEDetail': 'สำรองเพื่อจ่ายสินค้า',
+          'layout.zoneFDetail': 'วัสดุจำนวนมากกำลังเข้า',
+          'operations.title': 'สถานะรับเข้า / จ่ายออก',
+          'operations.subtitle': 'ซิงค์จาก Zebra TC-21 แบบเรียลไทม์',
+          'operations.part': 'รหัสชิ้นส่วน',
+          'operations.kanban': 'LocalKanbanID',
+          'operations.status': 'สถานะ',
+          'operations.time': 'เวลา',
+          'operations.received': 'รับเข้าเรียบร้อย',
+          'operations.pending': 'รอตรวจสอบ',
+          'operations.dispatched': 'จ่ายออกแล้ว',
+          'imports.title': 'ประวัติการนำเข้าและตรวจสอบ',
+          'imports.subtitle': 'ตรวจซ้ำด้วย Row-hash ป้องกันข้อมูลซ้ำ',
+          'imports.file': 'ไฟล์',
+          'imports.records': 'จำนวนข้อมูล',
+          'imports.result': 'ผลลัพธ์',
+          'imports.by': 'ผู้นำเข้า',
+          'imports.at': 'เวลา',
+          'imports.success': 'สำเร็จ',
+          'imports.partial': 'สำเร็จบางส่วน',
+          'imports.pending': 'รอตรวจสอบ',
+          'alerts.title': 'การแจ้งเตือนแบบเรียลไทม์',
+          'alerts.subtitle': 'แจ้งเตือนผ่าน Slack และอีเมล',
+          'alerts.alert1Title': 'โซน D Bin 07 ต่ำกว่าค่าปลอดภัย',
+          'alerts.alert1Body': 'เติมสต็อกภายใน 15 นาทีเพื่อป้องกันไลน์หยุด',
+          'alerts.alert2Title': 'อุณหภูมิกลับสู่ค่าปกติ',
+          'alerts.alert2Body': 'เซ็นเซอร์ห้องเย็นกลับมาปกติแล้ว',
+          'admin.title': 'ภาพรวมสิทธิ์การใช้งาน (RBAC)',
+          'admin.subtitle': 'บันทึก Audit Log 365 วัน',
+          'admin.role': 'บทบาท',
+          'admin.scope': 'ขอบเขต',
+          'admin.users': 'ผู้ใช้',
+          'admin.lastChange': 'แก้ไขล่าสุด',
+          'admin.scopeAdmin': 'เข้าถึงทั้งหมด',
+          'admin.scopePlanner': 'นำเข้า + แก้ผังคลัง',
+          'admin.scopeOperator': 'งานรับเข้า / จ่ายออก',
+          footer: 'Smart Factory พร้อมใช้งาน • รองรับ Docker / Kubernetes • พัฒนาด้วย NestJS + Next.js',
+        },
+      };
+
+      const switchLanguage = (lang) => {
+        document.querySelectorAll('[data-i18n]').forEach((node) => {
+          const key = node.getAttribute('data-i18n');
+          const translation = translations[lang]?.[key];
+          if (translation) {
+            node.textContent = translation;
+          }
+        });
+      };
+
+      document.querySelectorAll('button.language').forEach((btn) => {
+        btn.addEventListener('click', () => {
+          const lang = btn.getAttribute('data-lang');
+          document
+            .querySelectorAll('button.language')
+            .forEach((other) => other.classList.toggle('active', other === btn));
+          switchLanguage(lang);
+        });
+      });
+    </script>
+  </body>
+</html>
