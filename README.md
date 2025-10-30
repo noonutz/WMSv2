@@ -50,6 +50,9 @@ wms-monorepo/
    docker-compose up -d
    ```
 
+   The compose stack will boot PostgreSQL, Redis, MinIO, RabbitMQ, the NestJS API, the Next.js UI, and the monitoring toolset
+   (Prometheus + Grafana).
+
 3. **Install dependencies**:
    ```bash
    cd apps/backend && npm install
@@ -69,6 +72,15 @@ wms-monorepo/
    # Frontend
    cd apps/frontend && npm run dev
    ```
+
+6. **Demo credentials**
+
+   | Role     | Username | Password   |
+   |----------|----------|------------|
+   | Admin    | `admin`  | `Admin@123`|
+   | Operator | `operator` | `Operator@123` |
+
+   The sample credentials unlock the dashboard, layout grid, Min/Max alert center, import history, and RBAC overview pages.
 
 ## 📊 Dashboard Preview
 
