@@ -50,11 +50,19 @@ wms-monorepo/
    docker-compose up -d
    ```
 
+   The compose stack will boot PostgreSQL, Redis, MinIO, RabbitMQ, the NestJS API, the Next.js UI, and the monitoring toolset
+   (Prometheus + Grafana).
+
 3. **Install dependencies**:
    ```bash
    cd apps/backend && npm install
    cd ../frontend && npm install
    ```
+
+   > 💡 **Offline build note:** The frontend `npm run build` command invokes a helper script
+   > that falls back to a mock artifact when the Next.js binary is unavailable (for example,
+   > inside an isolated CI sandbox without registry access).  Once dependencies are installed
+   > you can run `npm run build:next` to execute the full Next.js compilation.
 
 4. **Run migrations**:
    ```bash
@@ -69,6 +77,15 @@ wms-monorepo/
    # Frontend
    cd apps/frontend && npm run dev
    ```
+
+6. **Demo credentials**
+
+   | Role     | Username | Password   |
+   |----------|----------|------------|
+   | Admin    | `admin`  | `Admin@123`|
+   | Operator | `operator` | `Operator@123` |
+
+   The sample credentials unlock the dashboard, layout grid, Min/Max alert center, import history, and RBAC overview pages.
 
 ## 📊 Dashboard Preview
 
