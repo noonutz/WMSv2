@@ -5,9 +5,7 @@ WORKDIR /app
 ENV NODE_ENV=production
 
 FROM base AS deps
-RUN apk add --no-cache python3 make g++
-COPY package.json package-lock.json ./
-COPY prisma ./prisma
+
 RUN npm ci
 RUN npm run db:generate
 
@@ -20,6 +18,7 @@ FROM base AS runner
 WORKDIR /app
 ENV NODE_ENV=production
 ENV PORT=3000
+
 COPY package.json package-lock.json ./
 COPY prisma ./prisma
 COPY --from=build /app/dist ./dist
