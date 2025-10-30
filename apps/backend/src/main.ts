@@ -35,11 +35,16 @@ async function bootstrap() {
   SwaggerModule.setup('api/docs', app, document);
 
   // Start the application
-  const port = config.get('PORT', 3000);
+  const configuredPort = config.get<string>('PORT');
+  const parsedPort = configuredPort ? Number.parseInt(configuredPort, 10) : 3000;
+  const port = Number.isNaN(parsedPort) ? 3000 : parsedPort;
   await app.listen(port);
-  
+
   Logger.log(`🚀 WMS Backend is running on: http://localhost:${port}`);
   Logger.log(`📖 API Documentation: http://localhost:${port}/api/docs`);
 }
 
-bootstrap();
+bootstrap().catch((error) => {
+  Logger.error('Failed to start application', error);
+  process.exit(1);
+});

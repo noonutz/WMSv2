@@ -24,15 +24,20 @@ type DeleteMockKey =
   | 'user';
 
 type DeleteMockRecord = Record<DeleteMockKey, jest.Mock>;
+type DeleteMockEntry = { deleteMany: jest.Mock<Promise<void>, []> };
+type TransactionClient = Record<DeleteMockKey, DeleteMockEntry>;
+type TransactionCallback = (client: TransactionClient) => Promise<void>;
 
 describe('PrismaService.cleanDatabase', () => {
   let service: PrismaService;
   let deleteMocks: DeleteMockRecord;
   let callOrder: DeleteMockKey[];
+  let transactionMock: jest.Mock<Promise<void>, [TransactionCallback]>;
 
-  const createDeleteMock = (key: DeleteMockKey) => {
-    const mock = jest.fn().mockImplementation(async () => {
+  const createDeleteMock = (key: DeleteMockKey): jest.Mock<Promise<void>, []> => {
+    const mock = jest.fn<Promise<void>, []>(() => {
       callOrder.push(key);
+      return Promise.resolve();
     });
     deleteMocks[key] = mock;
     return mock;
@@ -42,7 +47,7 @@ describe('PrismaService.cleanDatabase', () => {
     deleteMocks = {} as DeleteMockRecord;
     callOrder = [];
 
-    const transactionClient = {
+    const transactionClient: TransactionClient = {
       auditLog: { deleteMany: createDeleteMock('auditLog') },
       session: { deleteMany: createDeleteMock('session') },
       alert: { deleteMany: createDeleteMock('alert') },
@@ -68,17 +73,20 @@ describe('PrismaService.cleanDatabase', () => {
       user: { deleteMany: createDeleteMock('user') },
     };
 
+    transactionMock = jest.fn(async (callback: TransactionCallback) => {
+      await callback(transactionClient);
+    });
+
     service = {
-      $transaction: jest.fn(async (callback: (client: typeof transactionClient) => Promise<void>) => {
-        await callback(transactionClient);
-      }),
+      $transaction: transactionMock,
     } as unknown as PrismaService;
+
+    Object.setPrototypeOf(service, PrismaService.prototype);
   });
 
   it('deletes data sequentially following foreign key order', async () => {
-    await PrismaService.prototype.cleanDatabase.call(service);
+    await service.cleanDatabase();
 
-    const transactionMock = service.$transaction as unknown as jest.Mock;
     expect(transactionMock).toHaveBeenCalledTimes(1);
 
     const expectedOrder: DeleteMockKey[] = [
