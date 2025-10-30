@@ -13,25 +13,28 @@ export class PrismaService extends PrismaClient implements OnModuleInit, OnModul
 
   async cleanDatabase() {
     // Clean up all tables in the correct order
-    return this.$transaction([
-      this.auditLog.deleteMany(),
-      this.session.deleteMany(),
-      this.alert.deleteMany(),
-      this.inventoryMovement.deleteMany(),
-      this.inboundItem.deleteMany(),
-      this.outboundItem.deleteMany(),
-      this.inbound.deleteMany(),
-      this.outbound.deleteMany(),
-      this.inventoryItem.deleteMany(),
-      this.importDetail.deleteMany(),
-      this.importLog.deleteMany(),
-      this.bin.deleteMany(),
-      this.rack.deleteMany(),
-      this.zone.deleteMany(),
-      this.part.deleteMany(),
-      this.permission.deleteMany(),
-      this.role.deleteMany(),
-      this.user.deleteMany(),
-    ]);
+    return this.$transaction(async (tx) => {
+      await tx.auditLog.deleteMany();
+      await tx.session.deleteMany();
+      await tx.alert.deleteMany();
+      await tx.inventoryMovement.deleteMany();
+      await tx.inboundItem.deleteMany();
+      await tx.outboundItem.deleteMany();
+      await tx.inbound.deleteMany();
+      await tx.outbound.deleteMany();
+      await tx.inventoryItem.deleteMany();
+      await tx.importDetail.deleteMany();
+      await tx.importLog.deleteMany();
+      await tx.bin.deleteMany();
+      await tx.zoneBlockPart.deleteMany();
+      await tx.blockRack.deleteMany();
+      await tx.zoneBlock.deleteMany();
+      await tx.rack.deleteMany();
+      await tx.zone.deleteMany();
+      await tx.part.deleteMany();
+      await tx.permission.deleteMany();
+      await tx.role.deleteMany();
+      await tx.user.deleteMany();
+    });
   }
 }
