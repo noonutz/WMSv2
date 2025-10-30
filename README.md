@@ -59,6 +59,11 @@ wms-monorepo/
    cd ../frontend && npm install
    ```
 
+   > 💡 **Offline build note:** The frontend `npm run build` command invokes a helper script
+   > that falls back to a mock artifact when the Next.js binary is unavailable (for example,
+   > inside an isolated CI sandbox without registry access).  Once dependencies are installed
+   > you can run `npm run build:next` to execute the full Next.js compilation.
+
 4. **Run migrations**:
    ```bash
    cd apps/backend && npx prisma migrate deploy
