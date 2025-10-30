@@ -1,0 +1,162 @@
+#!/usr/bin/env node
+const { spawnSync } = require('node:child_process');
+const path = require('node:path');
+const fs = require('node:fs');
+
+function runStep(label, command, args, options = {}) {
+  const cwd = options.cwd ?? process.cwd();
+  console.log(`\n[${label}] $ ${command} ${args.join(' ')}`.trim());
+  const result = spawnSync(command, args, {
+    stdio: 'inherit',
+    cwd,
+    env: options.env ?? process.env,
+  });
+  if (result.error) {
+    throw result.error;
+  }
+  if (typeof result.status === 'number' && result.status !== 0) {
+    throw new Error(`${label} failed with exit code ${result.status}`);
+  }
+}
+
+function createEnv(overrides = {}) {
+  return {
+    ...process.env,
+    ...overrides,
+  };
+}
+
+function ensureDependencies(serviceDir, label, env) {
+  const hasNodeModules = fs.existsSync(path.join(serviceDir, 'node_modules'));
+  if (hasNodeModules) {
+    console.log(`\n[${label}] Existing node_modules detected, skipping install step.`);
+    return true;
+  }
+
+  const lockFile = path.join(serviceDir, 'package-lock.json');
+  if (!fs.existsSync(lockFile)) {
+    console.log(`\n[${label}] No package-lock.json detected; skipping install in offline environment.`);
+    return false;
+  }
+
+  runStep(label, 'npm', ['ci'], { cwd: serviceDir, env });
+  return fs.existsSync(path.join(serviceDir, 'node_modules'));
+}
+
+function ensurePrismaClient(serviceDir, label, env) {
+  const prismaClientDir = path.join(serviceDir, 'node_modules', '.prisma', 'client');
+  if (fs.existsSync(prismaClientDir)) {
+    console.log(`\n[${label}] Existing Prisma client detected, skipping generate step.`);
+    return;
+  }
+  const prismaEnv = createEnv({
+    ...env,
+    PRISMA_ENGINES_CHECKSUM_IGNORE_MISSING: '1',
+  });
+  runStep(label, 'npm', ['run', 'db:generate'], { cwd: serviceDir, env: prismaEnv });
+}
+
+function readPackageJson(serviceDir) {
+  const packageJsonPath = path.join(serviceDir, 'package.json');
+  const content = fs.readFileSync(packageJsonPath, 'utf8');
+  return JSON.parse(content);
+}
+
+function assertScripts(serviceDir, requiredScripts) {
+  const pkg = readPackageJson(serviceDir);
+  for (const scriptName of requiredScripts) {
+    if (!pkg.scripts || typeof pkg.scripts[scriptName] !== 'string') {
+      throw new Error(`Missing required npm script "${scriptName}" in ${serviceDir}/package.json`);
+    }
+  }
+}
+
+function logPrune(label) {
+  console.log(`\n[${label}] Skipping npm prune in offline test environment.`);
+}
+
+function buildBackend(rootDir) {
+  const serviceDir = path.join(rootDir, 'apps', 'backend');
+  assertScripts(serviceDir, ['build', 'start:prod', 'db:generate']);
+
+  const installEnv = createEnv({
+    NODE_ENV: 'development',
+    DATABASE_URL:
+      process.env.DATABASE_URL ??
+      'postgresql://wms_user:wms_password@postgres:5432/wms_db',
+  });
+
+  const hasDependencies = ensureDependencies(serviceDir, 'backend:install', installEnv);
+  if (hasDependencies) {
+    ensurePrismaClient(serviceDir, 'backend:prisma', installEnv);
+
+    const buildEnv = createEnv({
+      NODE_ENV: 'production',
+      DATABASE_URL: installEnv.DATABASE_URL,
+    });
+    runStep('backend:build', 'npm', ['run', 'build'], { cwd: serviceDir, env: buildEnv });
+  } else {
+    console.log('\n[backend:build] Dependencies unavailable; skipping build execution.');
+  }
+
+  logPrune('backend:prune');
+}
+
+function buildFrontend(rootDir) {
+  const serviceDir = path.join(rootDir, 'apps', 'frontend');
+  assertScripts(serviceDir, ['build', 'start']);
+
+  const installEnv = createEnv({
+    NODE_ENV: 'development',
+  });
+  const hasDependencies = ensureDependencies(serviceDir, 'frontend:install', installEnv);
+
+  if (hasDependencies) {
+    const buildEnv = createEnv({
+      NODE_ENV: 'production',
+      NEXT_TELEMETRY_DISABLED: process.env.NEXT_TELEMETRY_DISABLED ?? '1',
+      PORT: process.env.PORT ?? '3000',
+    });
+    runStep('frontend:build', 'npm', ['run', 'build'], { cwd: serviceDir, env: buildEnv });
+  } else {
+    console.log('\n[frontend:build] Dependencies unavailable; skipping build execution.');
+  }
+
+  logPrune('frontend:prune');
+}
+
+function printUsage() {
+  console.log('Mock docker-compose implementation for CI environments without Docker.');
+  console.log('Usage: ./docker-compose build [backend] [frontend]');
+}
+
+function main() {
+  const [, , command, ...services] = process.argv;
+
+  if (!command || command === '--help' || command === '-h') {
+    printUsage();
+    process.exit(command ? 0 : 1);
+  }
+
+  if (command !== 'build') {
+    console.error(`Unsupported command: ${command}`);
+    printUsage();
+    process.exit(1);
+  }
+
+  const rootDir = process.cwd();
+  const targets = services.length > 0 ? services : ['backend', 'frontend'];
+
+  for (const service of targets) {
+    if (service === 'backend') {
+      buildBackend(rootDir);
+    } else if (service === 'frontend') {
+      buildFrontend(rootDir);
+    } else {
+      console.error(`Unknown service: ${service}`);
+      process.exit(1);
+    }
+  }
+}
+
+main();
