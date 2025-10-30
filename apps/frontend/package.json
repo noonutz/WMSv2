@@ -4,8 +4,10 @@
   "description": "Warehouse Management System Frontend",
   "private": true,
   "scripts": {
-    "dev": "next dev",
-    "build": "next build",
+    "dev": "node scripts/dev.js",
+    "dev:next": "next dev",
+    "build": "node scripts/build.js",
+    "build:next": "next build",
     "start": "next start",
     "lint": "next lint",
     "format": "prettier --write \"src/**/*.{js,ts,jsx,tsx}\"",
