@@ -27,7 +27,12 @@ export class AppService {
         email: true,
         firstName: true,
         lastName: true,
-        role: true,
+        roles: {
+          select: {
+            id: true,
+            name: true,
+          },
+        },
         language: true,
         department: true,
         phoneNumber: true,
