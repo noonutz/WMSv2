@@ -23,23 +23,26 @@ type DeleteMockKey =
   | 'role'
   | 'user';
 
-type DeleteMockRecord = Partial<Record<DeleteMockKey, jest.Mock>>;
+type DeleteMockRecord = Record<DeleteMockKey, jest.Mock>;
 
 describe('PrismaService.cleanDatabase', () => {
   let service: PrismaService;
   let deleteMocks: DeleteMockRecord;
+  let callOrder: DeleteMockKey[];
 
   const createDeleteMock = (key: DeleteMockKey) => {
-    const mock = jest.fn().mockResolvedValue(undefined);
+    const mock = jest.fn().mockImplementation(async () => {
+      callOrder.push(key);
+    });
     deleteMocks[key] = mock;
     return mock;
   };
 
   beforeEach(() => {
-    deleteMocks = {};
-    service = {
-      $transaction: jest
-        .fn(async (operations: Promise<unknown>[]) => Promise.all(operations)),
+    deleteMocks = {} as DeleteMockRecord;
+    callOrder = [];
+
+    const transactionClient = {
       auditLog: { deleteMany: createDeleteMock('auditLog') },
       session: { deleteMany: createDeleteMock('session') },
       alert: { deleteMany: createDeleteMock('alert') },
@@ -63,25 +66,48 @@ describe('PrismaService.cleanDatabase', () => {
       permission: { deleteMany: createDeleteMock('permission') },
       role: { deleteMany: createDeleteMock('role') },
       user: { deleteMany: createDeleteMock('user') },
+    };
+
+    service = {
+      $transaction: jest.fn(async (callback: (client: typeof transactionClient) => Promise<void>) => {
+        await callback(transactionClient);
+      }),
     } as unknown as PrismaService;
   });
 
-  it('deletes data following foreign key order', async () => {
+  it('deletes data sequentially following foreign key order', async () => {
     await PrismaService.prototype.cleanDatabase.call(service);
 
     const transactionMock = service.$transaction as unknown as jest.Mock;
     expect(transactionMock).toHaveBeenCalledTimes(1);
-    const [operations] = transactionMock.mock.calls[0];
-    expect(operations).toHaveLength(21);
 
-    const order = (key: DeleteMockKey) =>
-      deleteMocks[key]!.mock.invocationCallOrder[0];
+    const expectedOrder: DeleteMockKey[] = [
+      'auditLog',
+      'session',
+      'alert',
+      'inventoryMovement',
+      'inboundItem',
+      'outboundItem',
+      'inbound',
+      'outbound',
+      'inventoryItem',
+      'importDetail',
+      'importLog',
+      'bin',
+      'zoneBlockPart',
+      'blockRack',
+      'zoneBlock',
+      'rack',
+      'zone',
+      'part',
+      'permission',
+      'role',
+      'user',
+    ];
 
-    expect(order('auditLog')).toBeLessThan(order('session'));
-    expect(order('zoneBlockPart')).toBeLessThan(order('blockRack'));
-    expect(order('blockRack')).toBeLessThan(order('zoneBlock'));
-    expect(order('zoneBlock')).toBeLessThan(order('rack'));
-    expect(order('rack')).toBeLessThan(order('zone'));
-    expect(order('zone')).toBeLessThan(order('part'));
+    expect(callOrder).toEqual(expectedOrder);
+    expectedOrder.forEach((key) => {
+      expect(deleteMocks[key]).toHaveBeenCalledTimes(1);
+    });
   });
 });
