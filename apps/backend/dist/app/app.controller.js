@@ -11,26 +11,27 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.AppController = void 0;
 const common_1 = require("@nestjs/common");
-const app_service_1 = require("./app.service");
 const swagger_1 = require("@nestjs/swagger");
+const app_service_1 = require("./app.service");
 let AppController = class AppController {
     constructor(appService) {
         this.appService = appService;
     }
-    getHealth() {
-        return this.appService.getHealth();
+    index() {
+        return this.appService.getWelcomeMessage();
     }
 };
 exports.AppController = AppController;
 __decorate([
-    (0, common_1.Get)('health'),
-    (0, swagger_1.ApiResponse)({ status: 200, description: 'Health check endpoint' }),
+    (0, common_1.Get)(),
+    (0, swagger_1.ApiOperation)({ summary: 'Root endpoint with basic service metadata' }),
+    (0, swagger_1.ApiOkResponse)({ description: 'Service metadata and available modules' }),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", []),
     __metadata("design:returntype", void 0)
-], AppController.prototype, "getHealth", null);
+], AppController.prototype, "index", null);
 exports.AppController = AppController = __decorate([
-    (0, swagger_1.ApiTags)('Health'),
+    (0, swagger_1.ApiTags)('root'),
     (0, common_1.Controller)(),
     __metadata("design:paramtypes", [app_service_1.AppService])
 ], AppController);

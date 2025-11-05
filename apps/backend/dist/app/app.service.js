@@ -12,44 +12,32 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.AppService = void 0;
 const common_1 = require("@nestjs/common");
 const config_1 = require("@nestjs/config");
-const prisma_service_1 = require("../shared/prisma/prisma.service");
 let AppService = class AppService {
-    constructor(configService, prismaService) {
+    constructor(configService) {
         this.configService = configService;
-        this.prismaService = prismaService;
     }
-    getHealth() {
+    getWelcomeMessage() {
         return {
-            status: 'ok',
-            timestamp: new Date().toISOString(),
+            name: 'WMS - Smart Factory API',
             version: this.configService.get('npm_package_version', '1.0.0'),
             environment: this.configService.get('NODE_ENV', 'development'),
-        };
-    }
-    async getProfile(user) {
-        const userProfile = await this.prismaService.user.findUnique({
-            where: { id: user.id },
-            select: {
-                id: true,
-                username: true,
-                email: true,
-                firstName: true,
-                lastName: true,
-                role: true,
-                language: true,
-                department: true,
-                phoneNumber: true,
-                lastLoginAt: true,
-                createdAt: true,
+            timestamp: new Date().toISOString(),
+            modules: {
+                auth: '/auth/login',
+                users: '/users',
+                layout: '/layout/overview',
+                inventory: '/inventory/summary',
+                imports: '/imports/logs',
+                alerts: '/alerts',
+                operations: '/operations/inbound',
             },
-        });
-        return userProfile;
+            documentation: '/api/docs',
+        };
     }
 };
 exports.AppService = AppService;
 exports.AppService = AppService = __decorate([
     (0, common_1.Injectable)(),
-    __metadata("design:paramtypes", [config_1.ConfigService,
-        prisma_service_1.PrismaService])
+    __metadata("design:paramtypes", [config_1.ConfigService])
 ], AppService);
 //# sourceMappingURL=app.service.js.map

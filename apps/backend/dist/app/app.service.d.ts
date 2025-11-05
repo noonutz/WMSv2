@@ -1,14 +1,21 @@
 import { ConfigService } from '@nestjs/config';
-import { PrismaService } from '../shared/prisma/prisma.service';
 export declare class AppService {
     private readonly configService;
-    private readonly prismaService;
-    constructor(configService: ConfigService, prismaService: PrismaService);
-    getHealth(): {
-        status: string;
+    constructor(configService: ConfigService);
+    getWelcomeMessage(): {
+        name: string;
+        version: string;
+        environment: string;
         timestamp: string;
-        version: any;
-        environment: any;
+        modules: {
+            auth: string;
+            users: string;
+            layout: string;
+            inventory: string;
+            imports: string;
+            alerts: string;
+            operations: string;
+        };
+        documentation: string;
     };
-    getProfile(user: any): Promise<any>;
 }

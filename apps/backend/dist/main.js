@@ -9,7 +9,7 @@ const common_2 = require("@nestjs/common");
 async function bootstrap() {
     const app = await core_1.NestFactory.create(app_module_1.AppModule);
     app.enableCors({
-        origin: process.env.FRONTEND_URL || 'http://localhost:3001',
+        origin: process.env.FRONTEND_URL || 'http://localhost:3000',
         credentials: true,
     });
     app.useGlobalPipes(new common_1.ValidationPipe({
@@ -26,10 +26,15 @@ async function bootstrap() {
         .build();
     const document = swagger_1.SwaggerModule.createDocument(app, swaggerConfig);
     swagger_1.SwaggerModule.setup('api/docs', app, document);
-    const port = config.get('PORT', 3000);
+    const configuredPort = config.get('PORT');
+    const parsedPort = configuredPort ? Number.parseInt(configuredPort, 10) : 3000;
+    const port = Number.isNaN(parsedPort) ? 3000 : parsedPort;
     await app.listen(port);
     common_2.Logger.log(`🚀 WMS Backend is running on: http://localhost:${port}`);
     common_2.Logger.log(`📖 API Documentation: http://localhost:${port}/api/docs`);
 }
-bootstrap();
+bootstrap().catch((error) => {
+    common_2.Logger.error('Failed to start application', error);
+    process.exit(1);
+});
 //# sourceMappingURL=main.js.map

@@ -2,10 +2,20 @@ import { AppService } from './app.service';
 export declare class AppController {
     private readonly appService;
     constructor(appService: AppService);
-    getHealth(): {
-        status: string;
+    index(): {
+        name: string;
+        version: string;
+        environment: string;
         timestamp: string;
-        version: any;
-        environment: any;
+        modules: {
+            auth: string;
+            users: string;
+            layout: string;
+            inventory: string;
+            imports: string;
+            alerts: string;
+            operations: string;
+        };
+        documentation: string;
     };
 }

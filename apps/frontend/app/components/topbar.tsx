@@ -1,6 +1,7 @@
 'use client';
 
 import { useLanguage } from '../lib/language-context';
+import { ThemeSwitcher } from './theme-switcher';
 
 export const Topbar = () => {
   const { language, setLanguage } = useLanguage();
@@ -12,6 +13,7 @@ export const Topbar = () => {
         <h1 className="text-lg font-semibold">Full Lifecycle Control Center</h1>
       </div>
       <div className="flex items-center gap-3">
+        <ThemeSwitcher />
         <button
           type="button"
           onClick={() => setLanguage(language === 'en' ? 'th' : 'en')}
